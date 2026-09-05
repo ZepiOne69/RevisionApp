@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réviser — Programme de 4ᵉ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14151c;
+    --panel: #1c1e28;
+    --panel-alt: #242634;
+    --line: #33364a;
+    --text: #ECE8E1;
+    --text-dim: #9a9db3;
+    --accent: #c9a46a;
+    --accent-dim: #7d6a48;
+    --good: #86ab7d;
+    --bad: #c1554b;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Public Sans", sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3, .serif{ font-family: "Fraunces", serif; font-weight: 500; }
+  .app{ max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+
+  /* ---------- HOME ---------- */
+  .hero{ margin-bottom: 48px; }
+  .hero .eyebrow{ color: var(--accent); font-size: 15px; margin: 0 0 10px; }
+  .hero h1{ font-size: clamp(34px, 6vw, 48px); line-height: 1.08; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .hero p{ color: var(--text-dim); font-size: 16px; line-height: 1.6; max-width: 46ch; margin:0; }
+
+  .account-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13px; color: var(--text-dim); }
+  .linklike{ background:none; border:none; color: var(--accent); font-size:13px; cursor:pointer; padding:0; font-family:inherit; text-decoration:underline; }
+
+  .auth-field{ margin-bottom:18px; }
+  .auth-field label{ display:block; font-size:13px; color: var(--text-dim); margin-bottom:6px; }
+  .auth-field input{
+    width:100%; background: var(--panel-alt); border:1px solid var(--line); border-radius:3px;
+    color: var(--text); font-size:15px; font-family:"Public Sans", sans-serif; padding: 12px 14px; outline:none;
+  }
+  .auth-field input:focus{ border-color: var(--accent); }
+  .auth-error{ color: var(--bad); font-size:14px; margin: 0 0 18px; }
+  .auth-hint{ color: var(--text-dim); font-size:13px; margin-top:22px; line-height:1.6; }
+  .auth-actions{ display:flex; gap:12px; margin-top:6px; }
+
+  .xp-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    padding: 18px 20px; background: var(--panel); border:1px solid var(--line); border-radius:4px;
+    margin-bottom: 32px; cursor:pointer; text-align:left; width:100%; color:inherit; font-family:inherit;
+  }
+  .xp-left{ display:flex; align-items:center; gap:16px; }
+  .level-badge{
+    width:44px; height:44px; border-radius:50%; border:1px solid var(--accent-dim);
+    display:flex; align-items:center; justify-content:center; font-family:"Fraunces", serif;
+    font-size:17px; color: var(--accent); flex-shrink:0;
+  }
+  .xp-text-title{ font-size:15px; margin:0 0 4px; }
+  .xp-track{ width:160px; height:4px; background: var(--line); border-radius:2px; overflow:hidden; }
+  .xp-fill{ height:100%; background: var(--accent); }
+  .xp-right{ color: var(--text-dim); font-size:13px; text-align:right; white-space:nowrap; }
+  .xp-right .see-more{ color: var(--accent); }
+
+  .subject-list{ border-top: 1px solid var(--line); }
+  .subject-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 22px 4px; border-bottom: 1px solid var(--line);
+    cursor:pointer; background:none; border-left:none; border-right:none; border-top:none;
+    width:100%; text-align:left; color:inherit; font-family:inherit;
+    transition: background-color .15s ease, padding-left .15s ease;
+  }
+  .subject-row:hover{ background: var(--panel); padding-left: 14px; }
+  .subject-row:focus-visible{ outline: 2px solid var(--accent); outline-offset: -2px; }
+  .subject-name{ font-family:"Fraunces", serif; font-size: 22px; font-weight:500; }
+  .subject-meta{ color: var(--text-dim); font-size: 14px; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-topbar{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 10px; }
+  .quiz-subject{ font-size:14px; color: var(--text-dim); }
+  .quiz-progress-text{ font-size:14px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .progress-track{ height:2px; background: var(--line); margin-bottom: 40px; }
+  .progress-fill{ height:2px; background: var(--accent); transition: width .3s ease; }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 40px 36px;
+  }
+  .question-text{ font-size: 23px; line-height:1.4; margin: 0 0 28px; font-weight:500; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; margin-bottom: 24px; }
+  .option-btn{
+    text-align:left; padding: 14px 16px; background: var(--panel-alt);
+    border: 1px solid var(--line); border-radius: 3px; color: var(--text);
+    font-family: "Public Sans", sans-serif; font-size:15px; cursor:pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+  .option-btn:hover{ border-color: var(--accent-dim); }
+  .option-btn.selected{ border-color: var(--accent); background: #2c2a20; }
+  .option-btn.correct{ border-color: var(--good); background: #1e2a1c; }
+  .option-btn.incorrect{ border-color: var(--bad); background: #2b1c1a; }
+  .option-btn:disabled{ cursor:default; }
+
+  .text-answer{ margin-bottom: 24px; }
+  .text-answer input{
+    width:100%; background:transparent; border:none; border-bottom: 1px solid var(--line);
+    color: var(--text); font-size:17px; font-family:"Public Sans", sans-serif;
+    padding: 8px 2px; outline:none;
+  }
+  .text-answer input:focus{ border-bottom-color: var(--accent); }
+  .text-answer input.correct{ border-bottom-color: var(--good); color: var(--good); }
+  .text-answer input.incorrect{ border-bottom-color: var(--bad); color: var(--bad); }
+
+  .feedback{ font-size:14px; line-height:1.6; padding-top:16px; border-top:1px solid var(--line); margin-bottom:24px; display:none; }
+  .feedback.good{ color: var(--good); }
+  .feedback.bad{ color: var(--bad); }
+  .feedback .explain{ color: var(--text-dim); display:block; margin-top:6px; }
+
+  .btn{
+    background: var(--accent); color:#191506; border:none; border-radius:3px;
+    padding: 13px 22px; font-family:"Public Sans", sans-serif; font-size:15px; font-weight:600;
+    cursor:pointer;
+  }
+  .btn:disabled{ opacity:.35; cursor:default; }
+  .btn.secondary{ background:none; border:1px solid var(--line); color: var(--text); }
+  .btn.ghost{ background:none; border:none; color: var(--text-dim); padding:8px 0; font-weight:400; text-decoration:underline; }
+
+  .row-end{ display:flex; justify-content:flex-end; gap:12px; }
+
+  .exit-link{ display:inline-block; margin-bottom:22px; background:none; border:none; color: var(--text-dim); font-size:14px; cursor:pointer; padding:0; font-family:inherit; }
+  .exit-link:hover{ color: var(--text); }
+
+  /* ---------- RESULTS ---------- */
+  .score-block{ text-align:center; margin: 8px 0 40px; }
+  .score-num{ font-size: 64px; margin:0; }
+  .score-label{ color: var(--text-dim); font-size:15px; margin-top:6px; }
+
+  .review-item{ border-top:1px solid var(--line); padding: 20px 0; }
+  .review-q{ font-size:16px; margin:0 0 8px; }
+  .review-your{ color: var(--bad); font-size:14px; margin:0 0 4px; }
+  .review-correct{ color: var(--good); font-size:14px; margin:0 0 4px; }
+  .review-explain{ color: var(--text-dim); font-size:14px; margin:0; }
+
+  .stat-grid{ display:flex; gap:12px; margin-bottom:36px; flex-wrap:wrap; }
+  .stat-box{ flex:1; min-width:130px; background: var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px; }
+  .stat-box .stat-num{ font-size:26px; margin:0; }
+  .stat-box .stat-label{ color: var(--text-dim); font-size:13px; margin:4px 0 0; }
+
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .history-left .h-subject{ font-family:"Fraunces", serif; font-size:16px; margin:0 0 3px; }
+  .history-left .h-date{ color: var(--text-dim); font-size:13px; margin:0; }
+  .history-right{ text-align:right; }
+  .history-right .h-score{ font-size:15px; margin:0 0 2px; }
+  .history-right .h-xp{ color: var(--accent); font-size:13px; margin:0; }
+  .empty-history{ color: var(--text-dim); font-size:14px; padding: 24px 0; }
+
+  .xp-gain-badge{
+    display:inline-block; color: var(--accent); font-size:14px; font-family:"Fraunces", serif;
+    margin-top:6px;
+  }
+
+  .hidden{ display:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* ===================== CONFIGURATION SUPABASE ===================== */
+const SUPABASE_URL = "https://kcxznnhnfwhlmpdrnpege.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjeHpubmhuZndobG1wZHJucGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDgzMDQsImV4cCI6MjEwNDE4NDMwNH0.-REyMMhDW_Aekn6KQHUspZLmJXqNSPLef_JfKzvGFWY";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let authError = "";
+let authBusy = false;
+
+/* ===================== DONNÉES ===================== */
+const DATA = {
+  maths: { label:"Mathématiques", questions:[
+    {type:"mcq", q:"Quel est l'opposé de −7 ?", options:["7","−7","0","1/7"], correct:0, explain:"L'opposé d'un nombre est celui qui, ajouté à lui, donne 0 : −7 + 7 = 0."},
+    {type:"text", q:"Calculer : −5 + 8 = ?", answers:["3"], explain:"−5 + 8 revient à avancer de 8 depuis −5 sur la droite graduée, on arrive à 3."},
+    {type:"mcq", q:"(−3) × (−4) = ?", options:["−12","12","−7","7"], correct:1, explain:"Le produit de deux nombres négatifs est toujours positif : 3 × 4 = 12."},
+    {type:"mcq", q:"Développer l'expression 3(x + 5) donne :", options:["3x + 5","3x + 15","x + 15","3x + 8"], correct:1, explain:"On distribue : 3×x + 3×5 = 3x + 15."},
+    {type:"text", q:"Résoudre l'équation x + 4 = 9. x = ?", answers:["5"], explain:"On soustrait 4 de chaque côté : x = 9 − 4 = 5."},
+    {type:"mcq", q:"Dans un triangle rectangle, le théorème de Pythagore relie :", options:["les trois angles","les trois côtés, dont l'hypoténuse","le périmètre et l'aire","les deux médianes"], correct:1, explain:"Il énonce que le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés."},
+    {type:"text", q:"Un triangle rectangle a des côtés de l'angle droit mesurant 3 cm et 4 cm. Quelle est la longueur de l'hypoténuse, en cm ?", answers:["5"], explain:"3² + 4² = 9 + 16 = 25, donc l'hypoténuse mesure √25 = 5 cm."},
+    {type:"mcq", q:"Deux grandeurs sont proportionnelles si :", options:["leur somme est constante","leur quotient est constant","leur différence est constante","il n'y a aucun lien"], correct:1, explain:"Le rapport (quotient) entre les deux grandeurs reste le même, c'est le coefficient de proportionnalité."}
+  ]},
+  francais: { label:"Français", questions:[
+    {type:"mcq", q:"Quel est le rôle d'un narrateur « omniscient » ?", options:["Il ne connaît que ses propres pensées","Il sait tout, y compris les pensées de tous les personnages","Il ne fait que décrire les lieux","Il est toujours un personnage secondaire"], correct:1, explain:"Le narrateur omniscient a une connaissance totale de l'histoire et des personnages."},
+    {type:"text", q:"Conjuguez « finir » au présent du subjonctif, 3ᵉ personne du singulier : « il faut qu'il ______. »", answers:["finisse"], explain:"Le subjonctif présent de finir : que je finisse, qu'il finisse."},
+    {type:"mcq", q:"Une métaphore est :", options:["une comparaison avec un mot de comparaison (« comme »)","une image qui associe deux idées sans mot de comparaison","une répétition de sons","une exagération volontaire"], correct:1, explain:"Contrairement à la comparaison, la métaphore ne contient pas de mot de comparaison."},
+    {type:"mcq", q:"Le registre de langue « soutenu » se caractérise par :", options:["un vocabulaire familier et des tournures relâchées","un vocabulaire courant et simple","un vocabulaire recherché et une syntaxe soignée","l'absence totale de vocabulaire spécifique"], correct:2, explain:"Le registre soutenu utilise un lexique précis, recherché, et une syntaxe travaillée."},
+    {type:"text", q:"Conjuguez « acheter » au conditionnel présent : « Si j'avais de l'argent, je m'______ un livre. »", answers:["achèterais"], explain:"Le conditionnel présent exprime une action soumise à une condition (« si… »)."},
+    {type:"mcq", q:"Une antithèse rapproche :", options:["deux mots de sens identique","deux idées opposées","deux rimes","deux personnages"], correct:1, explain:"L'antithèse met en évidence un contraste fort en juxtaposant deux idées opposées."},
+    {type:"mcq", q:"Dans une pièce de théâtre, une « didascalie » est :", options:["une réplique prononcée par un personnage","une indication scénique donnée par l'auteur","le titre d'un acte","une figure de style"], correct:1, explain:"Les didascalies sont les indications de mise en scène, souvent en italique, écrites par l'auteur."},
+    {type:"text", q:"Conjuguez « voir » au passé simple, 3ᵉ personne du singulier : « il ______. »", answers:["vit"], explain:"Passé simple de voir : je vis, tu vis, il vit."}
+  ]},
+  histoire: { label:"Histoire-Géographie & EMC", questions:[
+    {type:"mcq", q:"Quel événement marque le début de la Révolution française, en 1789 ?", options:["La prise de la Bastille","Le sacre de Napoléon","La bataille de Waterloo","La signature du traité de Versailles"], correct:0, explain:"La prise de la Bastille, le 14 juillet 1789, est restée le symbole du début de la Révolution."},
+    {type:"mcq", q:"Quel texte de 1789 proclame l'égalité des droits ?", options:["Le Code civil","La Déclaration des droits de l'homme et du citoyen","La Constitution de 1958","Le traité de Versailles"], correct:1, explain:"Adoptée en août 1789, elle affirme que les hommes naissent libres et égaux en droits."},
+    {type:"text", q:"En quelle année Napoléon Bonaparte est-il sacré empereur ?", answers:["1804"], explain:"Napoléon Ier est sacré empereur des Français le 2 décembre 1804."},
+    {type:"mcq", q:"La révolution industrielle du XIXᵉ siècle repose d'abord sur l'énergie :", options:["nucléaire","le charbon et la vapeur","le pétrole","le solaire"], correct:1, explain:"La machine à vapeur, alimentée au charbon, a été le moteur de cette révolution."},
+    {type:"mcq", q:"Un espace très peuplé, où se concentrent les activités urbaines, s'appelle :", options:["un désert humain","une métropole","un espace rural isolé","une réserve naturelle"], correct:1, explain:"Les métropoles concentrent population, emplois et fonctions de commandement."},
+    {type:"text", q:"Comment appelle-t-on le déplacement de personnes d'un pays vers un autre pour s'y installer durablement ?", answers:["migration","une migration","les migrations"], explain:"On parle de migration (ou de mobilité humaine internationale)."},
+    {type:"mcq", q:"La mondialisation se caractérise par :", options:["l'isolement des économies nationales","l'intensification des échanges à l'échelle mondiale","la disparition du commerce international","la fermeture des frontières"], correct:1, explain:"La mondialisation intensifie les flux de marchandises, de capitaux et de personnes entre pays."},
+    {type:"mcq", q:"En France, qui détient le pouvoir exécutif au niveau national ?", options:["Le maire","Le président de la République et le gouvernement","Le préfet","Le conseil régional"], correct:1, explain:"Le pouvoir exécutif applique les lois ; il est exercé par le président et le gouvernement."}
+  ]},
+  svt: { label:"SVT", questions:[
+    {type:"mcq", q:"Quel organe produit les spermatozoïdes ?", options:["Les testicules","Les ovaires","La prostate","L'utérus"], correct:0, explain:"Les testicules produisent les spermatozoïdes ainsi que la testostérone."},
+    {type:"mcq", q:"L'ovulation correspond à :", options:["la fécondation de l'ovule","la libération d'un ovule par l'ovaire","la formation du placenta","la naissance"], correct:1, explain:"Chaque cycle, un ovaire libère un ovule : c'est l'ovulation."},
+    {type:"text", q:"Quel est le nom de la cellule issue de la fusion d'un ovule et d'un spermatozoïde ?", answers:["cellule-oeuf","cellule oeuf","zygote"], explain:"Cette première cellule, appelée cellule-œuf (ou zygote), se divisera pour former l'embryon."},
+    {type:"mcq", q:"Le système nerveux central est composé de :", options:["les nerfs et les muscles","le cerveau et la moelle épinière","le cœur et les vaisseaux","les os et les articulations"], correct:1, explain:"Le cerveau et la moelle épinière forment le système nerveux central, relié au reste du corps par les nerfs."},
+    {type:"mcq", q:"Une substance qui perturbe le fonctionnement du système nerveux, comme l'alcool, est dite :", options:["nutritive","neurotoxique","hormonale","immunitaire"], correct:1, explain:"Ces substances, dites neurotoxiques, altèrent le fonctionnement des neurones."},
+    {type:"text", q:"Quel est le nom du phénomène qui libère brutalement de l'énergie le long d'une faille et provoque des secousses du sol ?", answers:["séisme","un séisme"], explain:"Un séisme (ou tremblement de terre) résulte d'une rupture brutale le long d'une faille."},
+    {type:"mcq", q:"Les volcans et les séismes se concentrent principalement :", options:["au hasard sur la planète","aux limites des plaques tectoniques","uniquement sous les océans","uniquement en montagne"], correct:1, explain:"L'essentiel de l'activité sismique et volcanique se situe aux frontières entre plaques."},
+    {type:"mcq", q:"La respiration cellulaire nécessite principalement :", options:["du dioxyde de carbone et de l'eau","du dioxygène et des nutriments","de la lumière uniquement","du sel"], correct:1, explain:"Les cellules utilisent le dioxygène pour libérer l'énergie contenue dans les nutriments."}
+  ]},
+  physique: { label:"Physique-Chimie", questions:[
+    {type:"mcq", q:"La lumière se propage en ligne droite dans :", options:["un milieu homogène et transparent","tout type de milieu","le vide uniquement","aucun milieu"], correct:0, explain:"Dans un milieu homogène et transparent (air, eau calme, vide…), la lumière se propage en ligne droite."},
+    {type:"text", q:"Quelle est la valeur approximative de la vitesse de la lumière dans le vide, en km/s (arrondie au millier) ?", answers:["300000","300 000"], explain:"La lumière parcourt environ 300 000 km chaque seconde dans le vide."},
+    {type:"mcq", q:"Un atome est constitué :", options:["d'un noyau et d'électrons","uniquement de protons","uniquement d'électrons","d'un noyau seul"], correct:0, explain:"L'atome comprend un noyau (protons + neutrons) entouré d'électrons."},
+    {type:"mcq", q:"Le noyau d'un atome contient :", options:["des électrons et des neutrons","des protons et des neutrons","seulement des protons","seulement des neutrons"], correct:1, explain:"Le noyau rassemble les protons (charge positive) et les neutrons (sans charge)."},
+    {type:"text", q:"Quelle est l'unité de l'intensité électrique ?", answers:["ampère","l'ampère","ampere"], explain:"L'intensité se mesure en ampères (A), à l'aide d'un ampèremètre."},
+    {type:"text", q:"Quelle est l'unité de la tension électrique ?", answers:["volt","le volt"], explain:"La tension se mesure en volts (V), à l'aide d'un voltmètre."},
+    {type:"mcq", q:"Dans un circuit en série, l'intensité du courant :", options:["est la même en tout point du circuit","diminue après chaque dipôle","double à chaque dipôle","est nulle"], correct:0, explain:"En série, il n'y a qu'un seul chemin pour le courant : l'intensité est identique partout."},
+    {type:"mcq", q:"Pour tester la présence de dioxygène, on utilise :", options:["l'eau de chaux, qui se trouble","une buchette incandescente, qui se ravive","le papier pH","l'eau salée"], correct:1, explain:"Le dioxygène ravive une buchette incandescente ; l'eau de chaux, elle, teste le dioxyde de carbone."}
+  ]},
+  anglais: { label:"Anglais", questions:[
+    {type:"mcq", q:"Choose the correct form: “She ______ to Paris last year.”", options:["has gone","went","goes","go"], correct:1, explain:"With a finished past time marker (“last year”), we use the preterit: went."},
+    {type:"mcq", q:"Which sentence uses the present perfect correctly?", options:["I have seen this film yesterday.","I have seen this film twice.","I have see this film.","I has seen this film."], correct:1, explain:"The present perfect suits an experience without a precise past date, like “twice.”"},
+    {type:"text", q:"Complete the comparative: “This book is ______ (interesting) than the other one.”", answers:["more interesting"], explain:"Long adjectives form the comparative with “more + adjective.”"},
+    {type:"mcq", q:"Choose the correct modal: “You ______ wear a seatbelt, it's the law.”", options:["might","must","would","could"], correct:1, explain:"“Must” expresses a strong obligation, here a legal one."},
+    {type:"text", q:"Give the superlative form of “good.”", answers:["the best","best"], explain:"“Good” is irregular: good → better → the best."},
+    {type:"mcq", q:"Which word is a question word asking about a reason?", options:["When","Where","Why","Who"], correct:2, explain:"“Why” asks for a reason or explanation."},
+    {type:"mcq", q:"The passive voice of “They built this house in 1990” is:", options:["This house built in 1990.","This house was built in 1990.","This house is building in 1990.","This house has build in 1990."], correct:1, explain:"Passive past simple: subject + was/were + past participle."},
+    {type:"text", q:"Complete with “since” or “for”: “I have lived here ______ five years.”", answers:["for"], explain:"“For” introduces a duration (five years); “since” introduces a starting point (2019, last June…)."}
+  ]}
+};
+
+/* ===================== PROGRESSION (XP / niveaux / historique) ===================== */
+const STORAGE_KEY = "reviser4eme_progress_v1";
+const XP_PER_LEVEL = 100;
+const XP_PER_CORRECT = 10;
+const XP_PERFECT_BONUS = 20;
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { xp:0, history:[] };
+    const parsed = JSON.parse(raw);
+    return { xp: parsed.xp || 0, history: Array.isArray(parsed.history) ? parsed.history : [] };
+  }catch(e){
+    return { xp:0, history:[] };
+  }
+}
+function saveProgress(progress){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+}
+let progress = loadProgress();
+
+/* ---- Synchronisation Supabase ---- */
+async function fetchRemoteProgress(userId){
+  const { data, error } = await supabaseClient.from("progress").select("*").eq("user_id", userId).maybeSingle();
+  if(error){ console.error(error); return null; }
+  return data;
+}
+async function upsertRemoteProgress(userId, xp, history){
+  const { error } = await supabaseClient.from("progress").upsert({ user_id: userId, xp, history, updated_at: new Date().toISOString() });
+  if(error) console.error(error);
+}
+async function handleAuthReady(user){
+  currentUser = user;
+  if(!user) { render(); return; }
+  const remote = await fetchRemoteProgress(user.id);
+  if(remote){
+    progress = { xp: remote.xp || 0, history: remote.history || [] };
+    saveProgress(progress);
+  } else {
+    await upsertRemoteProgress(user.id, progress.xp, progress.history);
+  }
+  render();
+}
+supabaseClient.auth.getSession().then(({ data }) => {
+  handleAuthReady(data.session ? data.session.user : null);
+});
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if(event === "SIGNED_IN") handleAuthReady(session.user);
+  if(event === "SIGNED_OUT") { currentUser = null; render(); }
+});
+
+function levelInfo(xp){
+  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+  const into = xp % XP_PER_LEVEL;
+  return { level, into, pct: Math.round((into / XP_PER_LEVEL) * 100), remaining: XP_PER_LEVEL - into };
+}
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR", { day:"numeric", month:"short", year:"numeric" });
+}
+function recordEvaluation(subjectKey, score, total){
+  const xpGained = score * XP_PER_CORRECT + (score === total ? XP_PERFECT_BONUS : 0);
+  progress.xp += xpGained;
+  progress.history.unshift({ date: new Date().toISOString(), subjectKey, score, total, xpGained });
+  saveProgress(progress);
+  if(currentUser) upsertRemoteProgress(currentUser.id, progress.xp, progress.history);
+  return xpGained;
+}
+
+/* ===================== ÉTAT ===================== */
+let state = { screen:"home", subjectKey:null, queue:[], index:0, answered:false, score:0, wrongList:[], lastXpGained:0 };
+
+function normalize(str){
+  return str.trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ");
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* ===================== RENDU ===================== */
+const app = document.getElementById("app");
+
+function render(){
+  if(state.screen==="home") renderHome();
+  else if(state.screen==="quiz") renderQuiz();
+  else if(state.screen==="results") renderResults();
+  else if(state.screen==="progress") renderProgress();
+  else if(state.screen==="auth") renderAuth();
+}
+
+function accountRowHtml(){
+  if(currentUser){
+    return `<div class="account-row"><span>Connecté : ${currentUser.email}</span><button class="linklike" id="logout-btn">Se déconnecter</button></div>`;
+  }
+  return `<div class="account-row"><span>Progression sauvegardée sur cet appareil seulement</span><button class="linklike" id="show-login-btn">Se connecter</button></div>`;
+}
+
+function xpBannerHtml(){
+  const info = levelInfo(progress.xp);
+  return `
+    <button class="xp-banner" id="xp-banner-btn">
+      <span class="xp-left">
+        <span class="level-badge">${info.level}</span>
+        <span>
+          <p class="xp-text-title serif">Niveau ${info.level}</p>
+          <span class="xp-track"><span class="xp-fill" style="width:${info.pct}%"></span></span>
+        </span>
+      </span>
+      <span class="xp-right">${progress.xp} XP<br><span class="see-more">Voir ma progression</span></span>
+    </button>
+  `;
+}
+
+function renderHome(){
+  const rows = Object.entries(DATA).map(([key, subj]) => `
+    <button class="subject-row" data-key="${key}">
+      <span class="subject-name">${subj.label}</span>
+      <span class="subject-meta">${subj.questions.length} questions</span>
+    </button>
+  `).join("");
+
+  app.innerHTML = `
+    <div class="hero">
+      <p class="eyebrow serif">Programme de 4ᵉ · 2025-2026</p>
+      <h1>Réviser, une matière à la fois.</h1>
+      <p>Choisis une matière ci-dessous. Chaque question appelle soit un choix parmi plusieurs réponses, soit une réponse à écrire toi-même.</p>
+    </div>
+    ${accountRowHtml()}
+    ${xpBannerHtml()}
+    <div class="subject-list">${rows}</div>
+  `;
+  app.querySelectorAll(".subject-row").forEach(btn=>{
+    btn.addEventListener("click", ()=> startQuiz(btn.dataset.key));
+  });
+  document.getElementById("xp-banner-btn").addEventListener("click", ()=>{ state.screen="progress"; render(); });
+  const loginBtn = document.getElementById("show-login-btn");
+  if(loginBtn) loginBtn.addEventListener("click", ()=>{ authError=""; state.screen="auth"; render(); });
+  const logoutBtn = document.getElementById("logout-btn");
+  if(logoutBtn) logoutBtn.addEventListener("click", async ()=>{ await supabaseClient.auth.signOut(); });
+}
+
+function startQuiz(key){
+  state.screen = "quiz";
+  state.subjectKey = key;
+  state.queue = shuffle(DATA[key].questions);
+  state.index = 0;
+  state.answered = false;
+  state.score = 0;
+  state.wrongList = [];
+  render();
+}
+
+function renderQuiz(){
+  const subj = DATA[state.subjectKey];
+  const q = state.queue[state.index];
+  const total = state.queue.length;
+  const pct = Math.round((state.index / total) * 100);
+
+  let bodyHtml = "";
+  if(q.type === "mcq"){
+    bodyHtml = `<div class="options">${q.options.map((opt,i)=>`
+      <button class="option-btn" data-i="${i}">${opt}</button>
+    `).join("")}</div>`;
+  } else {
+    bodyHtml = `<div class="text-answer"><input type="text" id="text-input" placeholder="Écris ta réponse…" autocomplete="off"></div>`;
+  }
+
+  app.innerHTML = `
+    <button class="exit-link" id="exit-btn">← Retour à l'accueil</button>
+    <div class="quiz-topbar">
+      <span class="quiz-subject serif">${subj.label}</span>
+      <span class="quiz-progress-text">Question ${state.index+1} / ${total}</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="question-text">${q.q}</p>
+      ${bodyHtml}
+      <div class="feedback" id="feedback"></div>
+      <div class="row-end">
+        <button class="btn" id="action-btn" disabled>Valider</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("exit-btn").addEventListener("click", ()=>{ state.screen="home"; render(); });
+
+  const actionBtn = document.getElementById("action-btn");
+  let selected = null;
+
+  if(q.type === "mcq"){
+    const optionBtns = app.querySelectorAll(".option-btn");
+    optionBtns.forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(state.answered) return;
+        optionBtns.forEach(b=>b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selected = parseInt(btn.dataset.i,10);
+        actionBtn.disabled = false;
+      });
+    });
+    actionBtn.addEventListener("click", ()=>{
+      if(!state.answered){
+        checkMcq(selected, q, optionBtns, actionBtn);
+      } else {
+        nextQuestion();
+      }
+    });
+  } else {
+    const input = document.getElementById("text-input");
+    input.addEventListener("input", ()=>{ actionBtn.disabled = input.value.trim().length === 0; });
+    input.addEventListener("keydown", (e)=>{ if(e.key==="Enter" && !actionBtn.disabled) actionBtn.click(); });
+    actionBtn.addEventListener("click", ()=>{
+      if(!state.answered){
+        checkText(input, q, actionBtn);
+      } else {
+        nextQuestion();
+      }
+    });
+  }
+}
+
+function showFeedback(isCorrect, explain){
+  const fb = document.getElementById("feedback");
+  fb.style.display = "block";
+  fb.className = "feedback " + (isCorrect ? "good" : "bad");
+  fb.innerHTML = (isCorrect ? "C'est exact." : "Ce n'est pas la bonne réponse.") + `<span class="explain">${explain}</span>`;
+}
+
+function checkMcq(selected, q, optionBtns, actionBtn){
+  state.answered = true;
+  const isCorrect = selected === q.correct;
+  optionBtns.forEach((b,i)=>{
+    b.disabled = true;
+    if(i === q.correct) b.classList.add("correct");
+    else if(i === selected) b.classList.add("incorrect");
+  });
+  if(isCorrect) state.score++;
+  else state.wrongList.push({ q: q.q, your: q.options[selected], correct: q.options[q.correct], explain: q.explain });
+  showFeedback(isCorrect, q.explain);
+  actionBtn.textContent = state.index === state.queue.length-1 ? "Voir le bilan" : "Suivant";
+  actionBtn.disabled = false;
+}
+
+function checkText(input, q, actionBtn){
+  state.answered = true;
+  const val = normalize(input.value);
+  const isCorrect = q.answers.some(a => normalize(a) === val);
+  input.disabled = true;
+  input.classList.add(isCorrect ? "correct" : "incorrect");
+  if(isCorrect) state.score++;
+  else state.wrongList.push({ q: q.q, your: input.value, correct: q.answers[0], explain: q.explain });
+  showFeedback(isCorrect, q.explain);
+  actionBtn.textContent = state.index === state.queue.length-1 ? "Voir le bilan" : "Suivant";
+  actionBtn.disabled = false;
+}
+
+function nextQuestion(){
+  if(state.index < state.queue.length - 1){
+    state.index++;
+    state.answered = false;
+    render();
+  } else {
+    state.lastXpGained = recordEvaluation(state.subjectKey, state.score, state.queue.length);
+    state.screen = "results";
+    render();
+  }
+}
+
+function renderResults(){
+  const subj = DATA[state.subjectKey];
+  const total = state.queue.length;
+  const reviewHtml = state.wrongList.length === 0
+    ? `<p style="color:var(--text-dim); margin-top:8px;">Toutes les réponses étaient correctes.</p>`
+    : state.wrongList.map(w => `
+      <div class="review-item">
+        <p class="review-q serif">${w.q}</p>
+        <p class="review-your">Ta réponse : ${w.your}</p>
+        <p class="review-correct">Réponse attendue : ${w.correct}</p>
+        <p class="review-explain">${w.explain}</p>
+      </div>
+    `).join("");
+
+  app.innerHTML = `
+    <button class="exit-link" id="exit-btn">← Retour à l'accueil</button>
+    <div class="score-block">
+      <p class="score-num serif">${state.score}/${total}</p>
+      <p class="score-label">${subj.label}</p>
+      <p class="xp-gain-badge">+${state.lastXpGained} XP</p>
+    </div>
+    <h3 class="serif" style="margin-bottom:0;">À revoir</h3>
+    ${reviewHtml}
+    <div class="row-end" style="margin-top:32px;">
+      <button class="btn secondary" id="home-btn">Retour à l'accueil</button>
+      <button class="btn" id="retry-btn">Recommencer</button>
+    </div>
+  `;
+  document.getElementById("exit-btn").addEventListener("click", ()=>{ state.screen="home"; render(); });
+  document.getElementById("home-btn").addEventListener("click", ()=>{ state.screen="home"; render(); });
+  document.getElementById("retry-btn").addEventListener("click", ()=> startQuiz(state.subjectKey));
+}
+
+function renderProgress(){
+  const info = levelInfo(progress.xp);
+  const evalCount = progress.history.length;
+  const avg = evalCount === 0 ? 0 : Math.round(
+    progress.history.reduce((sum,h)=> sum + (h.score/h.total), 0) / evalCount * 100
+  );
+
+  const historyHtml = evalCount === 0
+    ? `<p class="empty-history">Aucune évaluation pour l'instant. Termine un quiz pour commencer à gagner de l'XP.</p>`
+    : progress.history.map(h => `
+      <div class="history-item">
+        <div class="history-left">
+          <p class="h-subject serif">${DATA[h.subjectKey] ? DATA[h.subjectKey].label : h.subjectKey}</p>
+          <p class="h-date">${formatDate(h.date)}</p>
+        </div>
+        <div class="history-right">
+          <p class="h-score">${h.score}/${h.total}</p>
+          <p class="h-xp">+${h.xpGained} XP</p>
+        </div>
+      </div>
+    `).join("");
+
+  app.innerHTML = `
+    <button class="exit-link" id="exit-btn">← Retour à l'accueil</button>
+    ${accountRowHtml()}
+    <div class="hero">
+      <p class="eyebrow serif">Ta progression</p>
+      <h1>Niveau ${info.level}</h1>
+      <p>${info.remaining} XP avant le niveau ${info.level + 1}.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box"><p class="stat-num serif">${progress.xp}</p><p class="stat-label">XP total</p></div>
+      <div class="stat-box"><p class="stat-num serif">${evalCount}</p><p class="stat-label">Évaluations passées</p></div>
+      <div class="stat-box"><p class="stat-num serif">${avg}%</p><p class="stat-label">Score moyen</p></div>
+    </div>
+    <h3 class="serif" style="margin-bottom:0;">Historique</h3>
+    ${historyHtml}
+  `;
+  document.getElementById("exit-btn").addEventListener("click", ()=>{ state.screen="home"; render(); });
+  const loginBtn2 = document.getElementById("show-login-btn");
+  if(loginBtn2) loginBtn2.addEventListener("click", ()=>{ authError=""; state.screen="auth"; render(); });
+  const logoutBtn2 = document.getElementById("logout-btn");
+  if(logoutBtn2) logoutBtn2.addEventListener("click", async ()=>{ await supabaseClient.auth.signOut(); });
+}
+
+/* ===================== ÉCRAN DE CONNEXION ===================== */
+function renderAuth(){
+  app.innerHTML = `
+    <button class="exit-link" id="exit-btn">← Retour à l'accueil</button>
+    <div class="hero">
+      <p class="eyebrow serif">Ton compte</p>
+      <h1>Retrouve ta progression</h1>
+      <p>Connecte-toi (ou crée un compte) pour synchroniser ton XP et ton historique sur tous tes appareils.</p>
+    </div>
+    <div class="card">
+      ${authError ? `<p class="auth-error">${authError}</p>` : ""}
+      <div class="auth-field">
+        <label for="auth-email">Adresse email</label>
+        <input type="email" id="auth-email" autocomplete="email" placeholder="toi@exemple.com">
+      </div>
+      <div class="auth-field">
+        <label for="auth-password">Mot de passe</label>
+        <input type="password" id="auth-password" autocomplete="current-password" placeholder="8 caractères minimum">
+      </div>
+      <div class="auth-actions">
+        <button class="btn secondary" id="signup-btn" ${authBusy ? "disabled" : ""}>Créer un compte</button>
+        <button class="btn" id="signin-btn" ${authBusy ? "disabled" : ""}>Se connecter</button>
+      </div>
+      <p class="auth-hint">Si tu viens de créer un compte, vérifie ta boîte mail : il faut confirmer ton adresse avant de pouvoir te connecter.</p>
+    </div>
+  `;
+  document.getElementById("exit-btn").addEventListener("click", ()=>{ state.screen="home"; render(); });
+
+  const emailInput = document.getElementById("auth-email");
+  const passInput = document.getElementById("auth-password");
+
+  document.getElementById("signin-btn").addEventListener("click", async ()=>{
+    authBusy = true; authError="";
+    const { error } = await supabaseClient.auth.signInWithPassword({ email: emailInput.value.trim(), password: passInput.value });
+    authBusy = false;
+    if(error){ authError = "Connexion impossible : vérifie ton email et ton mot de passe."; render(); }
+    else { state.screen = "home"; render(); }
+  });
+
+  document.getElementById("signup-btn").addEventListener("click", async ()=>{
+    authBusy = true; authError="";
+    const { error } = await supabaseClient.auth.signUp({ email: emailInput.value.trim(), password: passInput.value });
+    authBusy = false;
+    if(error){ authError = "Impossible de créer le compte : " + error.message; render(); }
+    else { authError = "Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse, puis connecte-toi."; render(); }
+  });
+}
+
+render();
+</script>
+</body>
+</html>
